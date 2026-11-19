@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f5c4d">
+<title>Meri Dukaan — Point of Sale</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f1f4f3;--card:#fff;--ink:#12201b;--mut:#5f6f68;--line:#d9e2de;--pri:#0f5c4d;--on:#fff;--soft:#e3f1ec;--warn:#b45309;--warnbg:#fdf0dc;--red:#b42318;--redbg:#fdecea;--field:#fff;--hd:#0f5c4d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0e1714;--card:#16231f;--ink:#e8f1ed;--mut:#93a69e;--line:#26372f;--pri:#34a98a;--on:#04120d;--soft:#1d3029;--warn:#f0b35a;--warnbg:#3a2a0f;--red:#ff8a7a;--redbg:#3a1815;--field:#101c18;--hd:#0b3a31}}
+:root[data-theme=dark]{--bg:#0e1714;--card:#16231f;--ink:#e8f1ed;--mut:#93a69e;--line:#26372f;--pri:#34a98a;--on:#04120d;--soft:#1d3029;--warn:#f0b35a;--warnbg:#3a2a0f;--red:#ff8a7a;--redbg:#3a1815;--field:#101c18;--hd:#0b3a31}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Figtree,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--hd);z-index:10}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--hd);color:#fff;padding:12px 16px}
+h1{font-size:19px;margin:0;font-weight:700}header p{margin:1px 0 0;font-size:12px;opacity:.75}
+main{max-width:680px;margin:0 auto;padding:14px 12px 96px}
+.tab{display:none}.tab.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+h2{font-size:16px;margin:0 0 10px;font-weight:650}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--mut);margin:10px 0 4px}
+input,select{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;background:var(--field);color:var(--ink)}
+:focus-visible{outline:2px solid var(--pri);outline-offset:2px}
+button{font:inherit;cursor:pointer;color:inherit}
+.btn{min-height:44px;border:0;border-radius:10px;padding:0 16px;font-weight:600;background:var(--soft);color:var(--pri);display:inline-flex;align-items:center;justify-content:center;margin:0;font-size:15px;cursor:pointer}
+.btn.pri{background:var(--pri);color:var(--on)}.btn.red{background:var(--redbg);color:var(--red)}.btn:disabled{opacity:.45}
+.sm{min-height:36px;padding:0 12px}
+.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.g{flex:1}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.acts{display:flex;gap:8px;margin-top:12px}.acts>*{flex:1}
+#reader{display:none;border-radius:12px;overflow:hidden;background:#000;margin-bottom:10px}#reader.on{display:block}#reader video{width:100%!important;object-fit:cover}
+.st,.sub{font-size:13px;color:var(--mut)}.st{margin:10px 0 0}
+.empty{color:var(--mut);text-align:center;padding:18px 0;margin:0}
+.sg{display:flex;justify-content:space-between;gap:10px;width:100%;margin-top:6px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);text-align:left}
+.line{display:grid;grid-template-columns:1fr auto;gap:6px 10px;align-items:center;padding:11px 0;border-top:1px solid var(--line)}
+.nm{font-weight:600}.amt{text-align:right;font-weight:600}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.step button{width:42px;height:38px;border:0;background:var(--soft);font-size:19px;color:var(--pri)}.step span{min-width:36px;text-align:center;font-weight:600}
+.tot{display:flex;justify-content:space-between;padding:4px 0;color:var(--mut)}
+.tot.big{color:var(--ink);font-size:21px;font-weight:700;border-top:1px solid var(--line);margin-top:8px;padding-top:10px}
+.li{display:flex;gap:10px;align-items:center;width:100%;padding:11px 0;border:0;border-top:1px solid var(--line);background:none;text-align:left}
+.pill{font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--pri);white-space:nowrap}.pill.w{background:var(--warnbg);color:var(--warn)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:var(--soft);border-radius:12px;padding:12px}.stat small{display:block;color:var(--mut);font-size:12px}.stat b{font-size:20px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;border:0;background:none;padding:8px 0 7px;font-size:11.5px;font-weight:600;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px}nav button.on{color:var(--pri)}
+nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+dialog{border:0;padding:0;background:transparent;width:min(100%,400px);max-width:100%;max-height:100dvh;color:var(--ink)}dialog::backdrop{background:rgba(8,16,13,.62)}
+#cfm{background:var(--card);border-radius:14px;padding:18px;width:min(92%,340px)}
+.paper{background:#fff;color:#1a1a1a;font:13px/1.55 "IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;padding:22px 18px;margin:14px 12px 0;border-radius:4px;box-shadow:0 2px 0 #0003}
+.paper h3{margin:0 0 2px;text-align:center;font:600 17px "IBM Plex Mono",monospace}.paper .c{text-align:center}
+.paper hr{border:0;border-top:1px dashed #888;margin:10px 0}.paper .r{display:flex;justify-content:space-between;gap:10px}
+.paper .in{padding-left:12px;color:#555}.paper .b{font-weight:600;font-size:15px}
+.dacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#12201b;color:#fff;padding:10px 16px;border-radius:99px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30;max-width:90%;text-align:center}#toast.on{opacity:1}
+@media print{@page{margin:6mm}body>*:not(#rcpt){display:none!important}body::before{display:none}:root{padding:0}#rcpt[open]{display:block;position:static;width:80mm;margin:0;max-height:none}.dacts,#toast{display:none!important}.paper{margin:0;padding:0;box-shadow:none}}
+</style>
+</head>
+<body>
+<header><h1 id="hShop">Meri Dukaan</h1><p>Point of sale</p></header>
+<main>
+<section id="sell" class="tab on">
+ <div class="card"><h2>Scan to add</h2>
+  <div id="reader"></div>
+  <div class="acts" style="margin-top:0"><button class="btn pri" id="cOn">Start camera</button><button class="btn" id="cOff" disabled>Stop</button><label class="btn" for="shot">Take photo</label></div>
+  <input type="file" id="shot" accept="image/*" capture="environment" hidden>
+  <p class="st" id="st">Start the camera and hold a QR code or barcode inside the frame. If live scanning is blocked on your device, use Take photo.</p>
+  <div class="row" id="nf" hidden style="margin-top:8px"><span class="g">No product with code <b id="nfc"></b>.</span><button class="btn sm" id="nfb">Add product</button></div>
+  <label for="q">Search by name or type a code</label><input id="q" placeholder="Product name or code" autocomplete="off"><div id="sug"></div>
+ </div>
+ <div class="card"><div class="row"><h2 class="g" style="margin:0">Current sale</h2><span class="pill" id="cnt">0 items</span></div>
+  <div id="lines"></div>
+  <div class="tot"><span>Subtotal</span><span id="sub"></span></div>
+  <div class="tot" id="taxRow" hidden><span id="taxl">Tax</span><span id="taxv"></span></div>
+  <div class="row"><label for="disc" class="g" style="margin:0">Discount (Rs)</label><input id="disc" type="number" inputmode="decimal" min="0" placeholder="0" style="width:120px;text-align:right"></div>
+  <div class="tot big"><span>Total</span><span id="tot">Rs 0</span></div>
+  <div class="g2"><div><label for="cust">Customer (optional)</label><input id="cust" autocomplete="off"></div><div><label for="meth">Payment</label><select id="meth"><option>Cash</option><option>Card</option><option>Bank transfer</option><option>Mobile wallet</option></select></div></div>
+  <div class="acts"><button class="btn" id="clear">Clear sale</button><button class="btn pri" id="pay" disabled>Complete sale</button></div>
+ </div>
+</section>
+
+<section id="catalog" class="tab">
+ <div class="card"><h2 id="pTitle">Add product</h2><input type="hidden" id="pId">
+  <label for="pName">Product name</label><input id="pName" autocomplete="off">
+  <label for="pCode">QR code / barcode number</label><div class="row"><input id="pCode" class="g" autocomplete="off"><label class="btn" for="pShot">Scan</label></div>
+  <input type="file" id="pShot" accept="image/*" capture="environment" hidden>
+  <div class="g2"><div><label for="pBuy">Cost price (Rs)</label><input id="pBuy" type="number" inputmode="decimal" min="0" step="any"></div><div><label for="pSell">Selling price (Rs)</label><input id="pSell" type="number" inputmode="decimal" min="0" step="any"></div>
+  <div><label for="pStock">Stock on hand</label><input id="pStock" type="number" inputmode="numeric" min="0" step="1" value="0"></div><div><label for="pMin">Low-stock alert at</label><input id="pMin" type="number" inputmode="numeric" min="0" step="1" value="3"></div></div>
+  <div class="acts"><button class="btn red" id="pDel" hidden>Delete</button><button class="btn" id="pNew">Clear form</button><button class="btn pri" id="pSave">Save product</button></div>
+ </div>
+ <div class="card"><div class="row"><h2 class="g" style="margin:0">Products</h2><span class="pill" id="pc">0</span></div><input id="ps" placeholder="Search products" style="margin-top:10px"><div id="plist"></div></div>
+</section>
+
+<section id="report" class="tab">
+ <div class="card"><h2>Today</h2><div class="stats"><div class="stat"><small>Sales</small><b id="rS"></b></div><div class="stat"><small>Receipts</small><b id="rB"></b></div><div class="stat"><small>Profit</small><b id="rP"></b></div><div class="stat"><small>Units in stock</small><b id="rU"></b></div></div></div>
+ <div class="card"><h2>Recent sales</h2><p class="sub" style="margin:0 0 4px">Tap a sale to view, print or share its receipt.</p><div id="sales"></div></div>
+ <div class="card"><h2>Low stock</h2><div id="low"></div></div>
+</section>
+
+<section id="settings" class="tab">
+ <div class="card"><h2>Shop and receipt</h2>
+  <label for="sShop">Shop name</label><input id="sShop"><label for="sAddr">Address</label><input id="sAddr"><label for="sPhone">Phone</label><input id="sPhone" type="tel">
+  <label for="sTax">Sales tax (%) — leave 0 for none</label><input id="sTax" type="number" inputmode="decimal" min="0" max="100" step="any">
+  <label for="sFoot">Message at the bottom of the receipt</label><input id="sFoot">
+  <div class="acts"><button class="btn pri" id="sSave">Save settings</button></div></div>
+ <div class="card"><h2>Backup</h2><p class="sub" style="margin:0">Products and sales are stored in this browser on this device. Download a backup before clearing browser data or changing phones. Backups from the earlier version of this app can be restored here too.</p>
+  <div class="acts"><button class="btn pri" id="bk">Download backup</button><button class="btn" id="rs">Restore backup</button></div><input type="file" id="rFile" accept="application/json,.json" hidden></div>
+</section>
+</main>
+
+<nav>
+<button class="on" data-t="sell"><svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 10.5a1 1 0 0 0 1 .8h8.2a1 1 0 0 0 1-.8L19 8H6"/><circle cx="9" cy="19.5" r="1.2"/><circle cx="17" cy="19.5" r="1.2"/></svg>Sell</button>
+<button data-t="catalog"><svg viewBox="0 0 24 24"><path d="M12 3 4 7v10l8 4 8-4V7z"/><path d="m4 7 8 4 8-4M12 11v10"/></svg>Products</button>
+<button data-t="report"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>Reports</button>
+<button data-t="settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Settings</button>
+</nav>
+
+<dialog id="rcpt"><div class="paper" id="paper"></div><div class="dacts"><button class="btn pri" id="rPrint">Print</button><button class="btn" id="rShare">Share</button><button class="btn" id="rSave">Save file</button><button class="btn" id="rClose">Done</button></div></dialog>
+<dialog id="cfm"><p id="cmsg" style="margin:0 0 6px;font-weight:600"></p><div class="acts"><button class="btn" id="no">Cancel</button><button class="btn red" id="yes">Delete</button></div></dialog>
+<div id="toast" role="status"></div>
+<div id="fileScan" style="display:none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+const $=id=>document.getElementById(id),KEY='my_dukaan_pos_v3';
+const D0={shop:'Meri Dukaan',addr:'',phone:'',tax:0,foot:'Thank you for shopping with us!'};
+let db={products:[],sales:[],settings:{},seq:0},cart=[],sc=null,tt,cur=null,dl=null,ac,last={t:0,c:''};
+try{let d=JSON.parse(localStorage.getItem(KEY));if(d&&Array.isArray(d.products))db=d}catch(e){}
+function norm(){db.sales=db.sales||[];db.settings={...D0,...db.settings};db.seq=db.seq||db.sales.length}norm();
+const money=n=>'Rs '+(+n||0).toLocaleString('en-PK',{maximumFractionDigits:2});
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum=(a,k)=>a.reduce((s,x)=>s+(+x[k]||0),0);
+const fmt=d=>new Date(d).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+const find=c=>{c=String(c||'').trim();return db.products.find(p=>String(p.code).trim()===c)};
+const say=m=>$('st').textContent=m;
+function toast(m){let t=$('toast');t.textContent=m;(document.querySelector('dialog[open]')||document.body).appendChild(t);t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2400)}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Storage is full. Download a backup and clear old data.')}renderAll()}
+try{claude.use('downloads').then(d=>{dl=d},()=>{})}catch(e){}
+async function saveFile(name,data){if(!dl){toast('Saving files is not available in this view.');return}try{await dl.save({filename:name,data});toast('File saved')}catch(e){if(!e||e.code!=='declined')toast('Could not save the file.')}}
+function ask(m,ok='Delete'){return new Promise(r=>{$('cmsg').textContent=m;$('yes').textContent=ok;let d=$('cfm'),f=v=>()=>{d.close();r(v)};$('yes').onclick=f(true);$('no').onclick=f(false);d.oncancel=()=>r(false);d.showModal()})}
+function beep(){try{navigator.vibrate&&navigator.vibrate(40);ac=ac||new AudioContext();let o=ac.createOscillator(),g=ac.createGain();o.frequency.value=880;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.09)}catch(e){}}
+
+function tab(id){document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x.id===id));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.t===id));if(id!=='sell')stopScan();renderAll();scrollTo(0,0)}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+
+/* Selling */
+function addCode(raw){
+ let code=String(raw??'').trim();if(!code)return;let p=find(code);$('nf').hidden=true;
+ if(!p){$('nfc').textContent=code;$('nf').hidden=false;say('Product not found.');return}
+ if(p.stock<1){say(p.name+' is out of stock.');return}
+ let l=cart.find(x=>x.id===p.id);
+ if(l){if(l.qty>=p.stock){say('Only '+p.stock+' of '+p.name+' in stock.');return}l.qty++}
+ else cart.push({id:p.id,name:p.name,code:p.code,price:+p.sell,cost:+p.buy,qty:1});
+ say('Added: '+p.name);beep();renderCart();
+}
+$('nfb').onclick=()=>{clr();$('pCode').value=$('nfc').textContent;tab('catalog');$('pName').focus()};
+function sug(){let q=$('q').value.trim().toLowerCase(),a=q?db.products.filter(p=>(p.name+' '+p.code).toLowerCase().includes(q)).slice(0,5):[];$('sug').innerHTML=a.map(p=>`<button class="sg" data-c="${esc(p.code)}"><span>${esc(p.name)}</span><b>${money(p.sell)}</b></button>`).join('')}
+$('q').oninput=sug;
+$('q').onkeydown=e=>{if(e.key!=='Enter')return;let v=e.target.value.trim();if(!v)return;let p=find(v)||db.products.find(p=>p.name.toLowerCase().includes(v.toLowerCase()));addCode(p?p.code:v);e.target.value='';sug()};
+$('sug').onclick=e=>{let b=e.target.closest('.sg');if(b){addCode(b.dataset.c);$('q').value='';sug()}};
+
+const camErr=e=>{let n=String((e&&e.name)||'')+e;return(/NotAllowed|Permission/i.test(n)?'Camera access was blocked. Allow it for this site in your browser settings':/NotReadable|Track/i.test(n)?'The camera is busy in another app. Close that app and try again':'The camera could not start')+', or use Take photo.'};
+async function startScan(){
+ if(sc)return;
+ if(!window.Html5Qrcode){say('The scanner did not load. Check your internet connection and reload, or use Take photo.');return}
+ $('reader').classList.add('on');
+ try{const F=Html5QrcodeSupportedFormats;
+  sc=new Html5Qrcode('reader',{formatsToSupport:[F.QR_CODE,F.EAN_13,F.EAN_8,F.UPC_A,F.UPC_E,F.CODE_128,F.CODE_39,F.ITF],experimentalFeatures:{useBarCodeDetectorIfSupported:true},verbose:false});
+  await sc.start({facingMode:'environment'},{fps:12,qrbox:(w,h)=>({width:Math.min(w*.8,320),height:Math.min(h*.6,200)})},t=>{let n=Date.now();if(t===last.c&&n-last.t<1500)return;last={c:t,t:n};addCode(t)},()=>{});
+  $('cOn').disabled=true;$('cOff').disabled=false;say('Camera on. Hold a QR code or barcode inside the frame.');
+ }catch(e){sc=null;$('reader').classList.remove('on');say(camErr(e))}
+}
+async function stopScan(){let s=sc;sc=null;if(s){try{await s.stop();s.clear()}catch(e){}}$('reader').classList.remove('on');$('cOn').disabled=false;$('cOff').disabled=true}
+$('cOn').onclick=startScan;$('cOff').onclick=()=>{stopScan();say('Camera stopped.')};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopScan()});
+async function photo(e,ok){let f=e.target.files[0];e.target.value='';if(!f)return;say('Reading photo…');try{ok(await new Html5Qrcode('fileScan').scanFile(f,false))}catch(x){toast('No code found in that photo. Move closer and keep the code sharp.')}}
+$('shot').onchange=e=>photo(e,addCode);$('pShot').onchange=e=>photo(e,c=>{$('pCode').value=c;toast('Code read')});
+
+function calc(){let sub=sum(cart.map(x=>({v:x.qty*x.price})),'v'),disc=Math.min(sub,Math.max(0,+$('disc').value||0)),r=+db.settings.tax||0,tax=Math.round((sub-disc)*r)/100;return{sub,disc,tax,total:sub-disc+tax}}
+function renderCart(){
+ let c=calc(),n=sum(cart,'qty');$('cnt').textContent=n+(n===1?' item':' items');
+ $('lines').innerHTML=cart.length?cart.map((x,i)=>`<div class="line"><div><div class="nm">${esc(x.name)}</div><div class="sub">${money(x.price)} each</div></div><div class="amt">${money(x.qty*x.price)}</div><div class="step"><button data-i="${i}" data-d="-1" aria-label="Decrease quantity">−</button><span>${x.qty}</span><button data-i="${i}" data-d="1" aria-label="Increase quantity">+</button></div><div style="text-align:right"><button class="btn red sm" data-rm="${i}">Remove</button></div></div>`).join(''):'<p class="empty">No items yet. Scan a code or search above.</p>';
+ $('sub').textContent=money(c.sub);$('taxRow').hidden=!c.tax;$('taxl').textContent='Tax ('+db.settings.tax+'%)';$('taxv').textContent=money(c.tax);$('tot').textContent=money(c.total);$('pay').disabled=!cart.length;
+}
+$('lines').onclick=e=>{let b=e.target.closest('button');if(!b)return;
+ if(b.dataset.rm!=null)cart.splice(+b.dataset.rm,1);
+ else{let i=+b.dataset.i,x=cart[i],p=db.products.find(p=>p.id===x.id),n=x.qty+ +b.dataset.d;if(n<1)cart.splice(i,1);else if(p&&n>p.stock)toast('Only '+p.stock+' in stock.');else x.qty=n}
+ renderCart()};
+$('disc').oninput=renderCart;
+$('clear').onclick=async()=>{if(cart.length&&await ask('Remove all items from this sale?','Clear sale')){cart=[];renderCart()}};
+$('pay').onclick=()=>{
+ if(!cart.length)return;
+ for(let x of cart){let p=db.products.find(p=>p.id===x.id);if(!p||p.stock<x.qty){toast(x.name+': not enough stock.');return}}
+ let c=calc(),cost=sum(cart.map(x=>({v:x.qty*x.cost})),'v'),n=++db.seq;
+ let s={id:'R-'+String(n).padStart(4,'0'),date:new Date().toISOString(),customer:$('cust').value.trim(),method:$('meth').value,items:cart.map(x=>({...x})),subtotal:c.sub,discount:c.disc,tax:c.tax,taxRate:+db.settings.tax||0,total:c.total,cost,profit:c.sub-c.disc-cost};
+ cart.forEach(x=>db.products.find(p=>p.id===x.id).stock-=x.qty);db.sales.push(s);cart=[];$('disc').value='';$('cust').value='';persist();showReceipt(s);
+};
+
+/* Receipts */
+function showReceipt(s){
+ let S=db.settings,r=(a,b,k='')=>`<div class="r ${k}"><span>${a}</span><span>${b}</span></div>`;
+ $('paper').innerHTML=`<h3>${esc(S.shop)}</h3>${S.addr?`<div class="c">${esc(S.addr)}</div>`:''}${S.phone?`<div class="c">Tel ${esc(S.phone)}</div>`:''}<hr>${r('Receipt',esc(s.id))}${r('Date',fmt(s.date))}${s.customer?r('Customer',esc(s.customer)):''}${r('Payment',esc(s.method||'Cash'))}<hr>${s.items.map(x=>`<div>${esc(x.name)}</div>${r(x.qty+' × '+money(x.price),money(x.qty*x.price),'in')}`).join('')}<hr>${r('Subtotal',money(s.subtotal))}${s.discount?r('Discount','−'+money(s.discount)):''}${s.tax?r('Tax ('+s.taxRate+'%)',money(s.tax)):''}${r('TOTAL',money(s.total),'b')}<hr><div class="c">${esc(S.foot)}</div>`;
+ cur=s;$('rcpt').showModal();
+}
+function rtext(s){let S=db.settings,L=[S.shop,S.addr,S.phone&&'Tel '+S.phone,s.id+'  '+fmt(s.date),s.customer&&'Customer: '+s.customer,'Payment: '+(s.method||'Cash'),'--------------------------------'];
+ s.items.forEach(x=>L.push(x.name,'  '+x.qty+' × '+money(x.price)+' = '+money(x.qty*x.price)));
+ L.push('--------------------------------','Subtotal: '+money(s.subtotal),s.discount&&'Discount: −'+money(s.discount),s.tax&&'Tax ('+s.taxRate+'%): '+money(s.tax),'TOTAL: '+money(s.total),S.foot);return L.filter(Boolean).join('\n')}
+$('rPrint').onclick=()=>{try{print()}catch(e){toast('Printing is not available here. Use Share or Save file.')}};
+$('rShare').onclick=async()=>{let t=rtext(cur);try{if(navigator.share){await navigator.share({title:'Receipt '+cur.id,text:t});return}await navigator.clipboard.writeText(t);toast('Receipt copied to clipboard')}catch(e){if(!e||e.name!=='AbortError')toast('Sharing is not available here. Use Save file.')}};
+$('rSave').onclick=()=>saveFile('receipt-'+cur.id+'.txt',rtext(cur));
+$('rClose').onclick=()=>$('rcpt').close();
+
+/* Products */
+function clr(){['pId','pName','pCode','pBuy','pSell'].forEach(i=>$(i).value='');$('pStock').value=0;$('pMin').value=3;$('pTitle').textContent='Add product';$('pDel').hidden=true}
+$('pNew').onclick=clr;
+$('pSave').onclick=()=>{
+ let id=$('pId').value,v=i=>$(i).value.trim(),name=v('pName'),code=v('pCode'),buy=+v('pBuy')||0,sell=+v('pSell')||0,stock=Math.max(0,Math.floor(+v('pStock')||0)),min=Math.max(0,Math.floor(+v('pMin')||0));
+ if(!name||!code){toast('Enter a product name and a code.');return}
+ if(db.products.some(p=>String(p.code)===code&&p.id!==id)){toast('Another product already uses this code.');return}
+ if(id)Object.assign(db.products.find(p=>p.id===id),{name,code,buy,sell,stock,min});
+ else db.products.push({id:'P'+Date.now()+Math.random().toString(16).slice(2,6),name,code,buy,sell,stock,min});
+ persist();clr();toast('Product saved');
+};
+$('pDel').onclick=async()=>{let id=$('pId').value;if(cart.some(x=>x.id===id)){toast('This product is in the current sale.');return}if(await ask('Delete this product?')){db.products=db.products.filter(p=>p.id!==id);persist();clr()}};
+$('ps').oninput=renderProducts;
+$('plist').onclick=e=>{let b=e.target.closest('[data-e]'),p=b&&db.products.find(p=>p.id===b.dataset.e);if(!p)return;$('pId').value=p.id;$('pName').value=p.name;$('pCode').value=p.code;$('pBuy').value=p.buy;$('pSell').value=p.sell;$('pStock').value=p.stock;$('pMin').value=p.min;$('pTitle').textContent='Edit product';$('pDel').hidden=false;scrollTo(0,0)};
+function renderProducts(){
+ let q=$('ps').value.toLowerCase(),a=db.products.filter(p=>(p.name+' '+p.code).toLowerCase().includes(q));$('pc').textContent=db.products.length;
+ $('plist').innerHTML=a.length?a.map(p=>`<div class="li"><span class="g"><b>${esc(p.name)}</b><br><span class="sub">${esc(p.code)}, cost ${money(p.buy)}, price ${money(p.sell)}</span></span><span class="pill ${p.stock<=p.min?'w':''}">${p.stock} in stock</span><button class="btn sm" data-e="${p.id}">Edit</button></div>`).join(''):'<p class="empty">No products yet. Add your first product above.</p>';
+}
+
+/* Reports */
+function renderReport(){
+ let k=d=>new Date(d).toDateString(),t=k(new Date()),ts=db.sales.filter(s=>k(s.date)===t);
+ $('rS').textContent=money(sum(ts,'total'));$('rB').textContent=ts.length;$('rP').textContent=money(sum(ts,'profit'));$('rU').textContent=sum(db.products,'stock');
+ $('sales').innerHTML=db.sales.length?db.sales.slice(-50).reverse().map(s=>`<button class="li" data-id="${esc(s.id)}"><span class="g"><b>${esc(s.id)}</b><br><span class="sub">${fmt(s.date)}${s.customer?', '+esc(s.customer):''}</span></span><b>${money(s.total)}</b></button>`).join(''):'<p class="empty">No sales yet.</p>';
+ let low=db.products.filter(p=>p.stock<=p.min);
+ $('low').innerHTML=low.length?low.map(p=>`<div class="li"><span class="g">${esc(p.name)}</span><span class="pill w">${p.stock} left</span></div>`).join(''):'<p class="empty">All products are well stocked.</p>';
+}
+$('sales').onclick=e=>{let b=e.target.closest('.li'),s=b&&db.sales.find(x=>x.id===b.dataset.id);if(s)showReceipt(s)};
+
+/* Settings and backup */
+function fillSettings(){let S=db.settings;$('sShop').value=S.shop;$('sAddr').value=S.addr;$('sPhone').value=S.phone;$('sTax').value=S.tax;$('sFoot').value=S.foot;$('hShop').textContent=S.shop;document.title=S.shop+' — Point of Sale'}
+$('sSave').onclick=()=>{db.settings={shop:$('sShop').value.trim()||D0.shop,addr:$('sAddr').value.trim(),phone:$('sPhone').value.trim(),tax:Math.max(0,Math.min(100,+$('sTax').value||0)),foot:$('sFoot').value.trim()};persist();fillSettings();toast('Settings saved')};
+$('bk').onclick=()=>saveFile('meri-dukaan-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(db,null,2));
+$('rs').onclick=()=>$('rFile').click();
+$('rFile').onchange=async e=>{let f=e.target.files[0];e.target.value='';if(!f)return;
+ try{let d=JSON.parse(await f.text());if(!Array.isArray(d.products)||!Array.isArray(d.sales))throw 0;if(await ask('Replace all current data with this backup?','Restore')){db=d;norm();persist();fillSettings();toast('Backup restored')}}catch(x){toast('That file is not a valid backup.')}};
+
+function renderAll(){renderProducts();renderReport();renderCart()}
+fillSettings();clr();renderAll();
+</script>
+</body>
+</html>
